@@ -57,8 +57,13 @@
     }
 
     .hero h2 {
-      font-size: 65px;
+      font-size: 72px;
       margin-bottom: 15px;
+      background: linear-gradient(90deg, #ffffff, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 800;
+      letter-spacing: -2px;
     }
 
     .hero span {
@@ -77,10 +82,12 @@
     }
 
     .panel {
-      background: #111827;
-      border-radius: 20px;
-      padding: 25px;
+      background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
+      border-radius: 24px;
+      padding: 28px;
       border: 1px solid #1f2937;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+      backdrop-filter: blur(10px);
     }
 
     .panel h3 {
@@ -136,11 +143,29 @@
     }
 
     .card {
-      background: #1e293b;
-      border-radius: 18px;
-      padding: 20px;
+      background: linear-gradient(180deg, #1e293b 0%, #172033 100%);
+      border-radius: 22px;
+      padding: 22px;
       border: 1px solid #334155;
-      transition: 0.2s;
+      transition: 0.25s ease;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #3b82f6, #06b6d4);
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: #3b82f6;
     }
 
     .card:hover {
@@ -159,12 +184,31 @@
     }
 
     .password-box {
-      background: #0f172a;
-      padding: 12px;
-      border-radius: 10px;
+      background: #0b1220;
+      padding: 14px;
+      border-radius: 12px;
       margin-bottom: 15px;
       overflow: hidden;
       text-overflow: ellipsis;
+      border: 1px solid #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hidden-password {
+      letter-spacing: 3px;
+      color: #cbd5e1;
+      font-size: 15px;
+    }
+
+    .eye-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 18px;
     }
 
     .card-buttons {
@@ -341,7 +385,8 @@
           <p>${item.username}</p>
 
           <div class="password-box">
-            ${item.password}
+            <span class="hidden-password">••••••••••••</span>
+            <button class="eye-btn">👁</button>
           </div>
 
           <div class="card-buttons">
@@ -349,6 +394,23 @@
             <button class="delete-btn">Delete</button>
           </div>
         `;
+
+        const eyeBtn = card.querySelector('.eye-btn');
+        const hiddenPassword = card.querySelector('.hidden-password');
+
+        let visible = false;
+
+        eyeBtn.addEventListener('click', () => {
+          visible = !visible;
+
+          if (visible) {
+            hiddenPassword.textContent = item.password;
+            eyeBtn.textContent = '🙈';
+          } else {
+            hiddenPassword.textContent = '••••••••••••';
+            eyeBtn.textContent = '👁';
+          }
+        });
 
         card.querySelector('.copy-btn').addEventListener('click', () => {
           navigator.clipboard.writeText(item.password);
