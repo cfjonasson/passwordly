@@ -296,6 +296,11 @@
       <p>Store all your passwords in one place</p>
     </div>
 
+    <div class="panel" style="margin-bottom:25px;">
+      <h3>🔒 Security Center</h3>
+      <div id="securityWarnings"></div>
+    </div>
+
     <div class="stats">
       <div class="stat">
         <h2 id="totalPasswords">0</h2>
@@ -360,6 +365,49 @@
 
     let passwords = JSON.parse(localStorage.getItem('passwordly')) || [];
 
+    function checkPasswordStrength(password) {
+      const common = ['123456','password','qwerty','admin','12345678'];
+      if (common.includes(password.toLowerCase())) return 'easy';
+      if (password.length < 8) return 'easy';
+      return 'good';
+    }
+
+    function updateSecurityCenter() {
+      const warnings = document.getElementById('securityWarnings');
+      warnings.innerHTML = '';
+
+      const reused = {};
+      passwords.forEach(p => {
+        reused[p.password] = (reused[p.password] || 0) + 1;
+      });
+
+      let found = false;
+
+      passwords.forEach(item => {
+        const strength = checkPasswordStrength(item.password);
+
+        if (strength === 'easy') {
+          warnings.innerHTML += `<div style="background:#3b0d0d;padding:14px;border-radius:12px;margin-bottom:10px;border:1px solid #7f1d1d;">⚠️ <b>${item.website}</b>: Easy to guess password</div>`;
+          found = true;
+        }
+
+        if (reused[item.password] > 1) {
+          warnings.innerHTML += `<div style="background:#3b2a0d;padding:14px;border-radius:12px;margin-bottom:10px;border:1px solid #92400e;">♻️ <b>${item.website}</b>: Password reused on multiple sites</div>`;
+          found = true;
+        }
+
+        const compromisedWords = ['123456','password','qwerty'];
+        if (compromisedWords.includes(item.password.toLowerCase())) {
+          warnings.innerHTML += `<div style="background:#2b123b;padding:14px;border-radius:12px;margin-bottom:10px;border:1px solid #6b21a8;">🚨 <b>${item.website}</b>: Potentially exposed/common password</div>`;
+          found = true;
+        }
+      });
+
+      if (!found) {
+        warnings.innerHTML = `<div style="background:#052e16;padding:14px;border-radius:12px;border:1px solid #166534;">✅ No major security issues found</div>`;
+      }
+    }
+
     function updateStats() {
       totalPasswords.textContent = passwords.length;
       copiedCount.textContent = copied;
@@ -416,6 +464,7 @@
           navigator.clipboard.writeText(item.password);
           copied++;
           updateStats();
+      updateSecurityCenter();
           alert('Password copied!');
         });
 
@@ -453,7 +502,10 @@
 
     renderPasswords();
     updateStats();
+    updateSecurityCenter();
   </script>
 
 </body>
 </html>
+https://YOUR_USERNAME.github.io/passwordly
+```
